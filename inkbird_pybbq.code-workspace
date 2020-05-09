@@ -1,0 +1,8 @@
+{
+	"folders": [
+		{
+			"uri": "vscode-remote://ssh-remote+192.168.200.227/home/pi/inkbird_pybbq"
+		}
+	],
+	"remoteAuthority": "ssh-remote+192.168.200.227"
+}
