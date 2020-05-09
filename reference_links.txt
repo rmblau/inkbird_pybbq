@@ -1,0 +1,9 @@
+# Installing bluez on pi
+https://www.argenox.com/library/bluetooth-low-energy/using-raspberry-pi-ble/
+
+# Possible repositories for how to use bluepy in python
+https://github.com/jshridha/inkbird
+https://github.com/viyh/inkbird
+
+# Example of using an ESP32 as a gateway between WiFi and ble Inkbird Thermometer
+https://github.com/dereulenspiegel/ibbq-gateway
