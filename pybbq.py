@@ -9,10 +9,6 @@ import signal
 
 
 
-address = "F8:30:02:48:75:17"
-
-
-
 SETTINGS_RESULT_UUID    = 0xfff1
 ACCOUNT_AND_VERIFY_UUID = 0xfff2
 HISTORY_DATA_UUID       = 0xfff3
@@ -28,7 +24,8 @@ UNITS_C_MESSAGE              = bytes( [ 0x02, 0x00, 0x00, 0x00, 0x00, 0x00 ] )
 REQ_BATTERY_MESSAGE          = bytes( [ 0x08, 0x24, 0x00, 0x00, 0x00, 0x00 ] )
 
 
-
+scanner         = None
+address         = None
 client          = None
 service         = None
 characteristics = None
@@ -85,9 +82,49 @@ class Delegate( btle.DefaultDelegate ):
 
 
 
-def signal_handler( sig, frame ):
+class ScanDelegate( btle.DefaultDelegate ):
+    
 
-    global client
+
+    def __init__( self ):
+    
+        btle.DefaultDelegate.__init__( self )
+
+
+
+    def handleDiscovery( self, dev, isNewDev, isNewData ):
+
+        global address
+        global scanner
+    
+        if isNewDev:
+    
+            if dev.getValueText( 9 ) == 'iBBQ':
+                    
+                    print( "Found iBBQ at ", dev.addr )
+                    address = dev.addr
+            
+        elif isNewData:
+    
+            pass
+
+        # End if/else
+
+# End ScanDelegate( )
+
+
+
+def checkUID( ):
+
+    if not os.geteuid( ) == 0:
+
+        sys.exit( "\nOnly root can run this script!!!\n" )
+
+# End checkUID( )
+
+
+
+def signal_handler( sig, frame ):
 
     # Shutdown gracefully
     print( 'Exiting...' )
@@ -107,15 +144,25 @@ def toggleBluetoothInterface( ):
 
 
 
-def main( ):
 
-    global client
-    global service
-    global characteristics
+def scanForIBBQ( ):
 
-    signal.signal( signal.SIGINT, signal_handler )
+    global scanner
 
+    # Toggle the bluetooth interface if it is up, or bring it up if it is down
     toggleBluetoothInterface( )
+
+    print( "Scanning for devices... Will take about 10 seconds..." )
+
+    # Scan for the iBBQ device name and store it's mac address
+    scanner = btle.Scanner( ).withDelegate( ScanDelegate( ) )
+    scanner.scan( 10.0 )
+    
+# End scanForIBBQ
+
+
+
+def readInformation( ):
 
     # Connect
     client = btle.Peripheral( address )
@@ -142,6 +189,26 @@ def main( ):
 
         service.peripheral.readCharacteristic( characteristics[ 3 ].handle )
         characteristics[ 4 ].write( REQ_BATTERY_MESSAGE, withResponse = True )
+
+# End readInformation( )
+
+
+
+def main( ):
+
+    global address
+
+    # Register handler for CTRL+C quitting
+    signal.signal( signal.SIGINT, signal_handler )
+
+    # Make sure we are root, otherwise BLE functions won't work
+    checkUID( )
+    
+    # Auto scan for the iBBQ thermometer
+    scanForIBBQ( )
+
+    # Proceed ( this is a place holder until more is methodized )
+    readInformation( )
 
 # End main( )
 
