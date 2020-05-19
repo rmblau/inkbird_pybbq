@@ -90,9 +90,7 @@ def signal_handler( sig, frame ):
     global client
 
     # Shutdown gracefully
-    print( 'exiting per ctrl c' )
-
-    client.disconnect( )
+    print( 'Exiting...' )
 
     sys.exit( 0 )
 
