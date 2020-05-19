@@ -91,13 +91,12 @@ class ScanDelegate( btle.DefaultDelegate ):
     def handleDiscovery( self, dev, isNewDev, isNewData ):
 
         global address
-        global scanner
     
         if isNewDev:
     
             if dev.getValueText( 9 ) == 'iBBQ':
                     
-                    print( "Found iBBQ at ", dev.addr )
+                    print( '\nFound iBBQ at ', dev.addr, '\n' )
                     address = dev.addr
             
         elif isNewData:
@@ -113,7 +112,7 @@ class ScanDelegate( btle.DefaultDelegate ):
 def signalHandler( sig, frame ):
 
     # Shutdown gracefully
-    print( 'Exiting...' )
+    print( '\nExiting...\n' )
 
     sys.exit( 0 )
 
@@ -134,15 +133,41 @@ def toggleBluetoothInterface( ):
 def scanForIBBQ( ):
 
     global scanner
+    global address
 
-    # Toggle the bluetooth interface if it is up, or bring it up if it is down
-    toggleBluetoothInterface( )
+    retryCount  = 0
+    timeout     = 2.5
 
-    print( "Scanning for devices... Will take about 10 seconds..." )
+    while address == None and retryCount < 3:
 
-    # Scan for the iBBQ device name and store it's mac address
-    scanner = btle.Scanner( ).withDelegate( ScanDelegate( ) )
-    scanner.scan( 10.0 )
+        # Toggle the bluetooth interface if it is up, or bring it up if it is down
+        toggleBluetoothInterface( )
+
+        print( 'Scanning for devices for ', timeout, ' seconds...' )
+
+        # Scan for the iBBQ device name and store it's mac address
+        scanner = btle.Scanner( ).withDelegate( ScanDelegate( ) )
+        scanner.scan( timeout )
+
+        if address == None:
+
+            # Increment retry count
+            retryCount += 1
+
+            # Double the timeout time. Will go 2.5, 5, 10 seconds.
+            timeout    *= 2
+
+        else:
+            
+            # We have found the device
+            deviceFound = True
+
+        # End if/else
+
+    if address == None and retryCount == 3:
+
+        # Did not find the device
+        sys.exit( '\nUnable to find the device. Is it on and in range?\n' )
     
 # End scanForIBBQ
 
@@ -181,8 +206,6 @@ def readInformation( ):
 
 
 def main( ):
-
-    global address
 
     # Register handler for CTRL+C quitting
     signal.signal( signal.SIGINT, signalHandler )
