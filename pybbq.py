@@ -1,4 +1,5 @@
 from bluepy import btle
+from elevate import elevate
 
 import struct
 import logging
@@ -6,6 +7,7 @@ import array
 import os
 import sys
 import signal
+
 
 
 
@@ -84,13 +86,7 @@ class Delegate( btle.DefaultDelegate ):
 
 class ScanDelegate( btle.DefaultDelegate ):
     
-
-
-    def __init__( self ):
     
-        btle.DefaultDelegate.__init__( self )
-
-
 
     def handleDiscovery( self, dev, isNewDev, isNewData ):
 
@@ -114,17 +110,7 @@ class ScanDelegate( btle.DefaultDelegate ):
 
 
 
-def checkUID( ):
-
-    if not os.geteuid( ) == 0:
-
-        sys.exit( "\nOnly root can run this script!!!\n" )
-
-# End checkUID( )
-
-
-
-def signal_handler( sig, frame ):
+def signalHandler( sig, frame ):
 
     # Shutdown gracefully
     print( 'Exiting...' )
@@ -199,11 +185,11 @@ def main( ):
     global address
 
     # Register handler for CTRL+C quitting
-    signal.signal( signal.SIGINT, signal_handler )
-
-    # Make sure we are root, otherwise BLE functions won't work
-    checkUID( )
+    signal.signal( signal.SIGINT, signalHandler )
     
+    # Elevate to root permission
+    elevate( graphical = False )
+
     # Auto scan for the iBBQ thermometer
     scanForIBBQ( )
 
