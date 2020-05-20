@@ -1,4 +1,5 @@
 from bluepy  import btle
+from decimal import Decimal
 
 import struct
 import array
@@ -49,24 +50,20 @@ class NotificationDelegate( btle.DefaultDelegate ):
         
         # Load up 2 arrays
         ctemps = array.array( "H" )
-        ftemps = array.array( "f" )
-
+        
         # Fill the array with the temperatures
         ctemps.frombytes( data )
 
-        # Loop through the celsius temperatures
-        for index, ctemp in enumerate( ctemps ):
-
-            # Device reports celsius * 10
-            ctemp = ctemp / 10
-
-            # Convert to Fahrenheit
-            ftemp = utils.convertCToF( ctemp )
-
-            # Convert temperature and store in fahrenheit array
-            ftemps.append( ftemp )
-
-        # End for
+        # Fill each variable the decimal result
+        fTempProbe0 = round( Decimal( utils.convertCToF( ctemps[ 0 ] / 10  ) ), 2 )
+        fTempProbe1 = round( Decimal( utils.convertCToF( ctemps[ 1 ] / 10  ) ), 2 )
+        fTempProbe2 = round( Decimal( utils.convertCToF( ctemps[ 2 ] / 10  ) ), 2 )
+        fTempProbe3 = round( Decimal( utils.convertCToF( ctemps[ 3 ] / 10  ) ), 2 )
+        fTempProbe4 = round( Decimal( utils.convertCToF( ctemps[ 4 ] / 10  ) ), 2 )
+        fTempProbe5 = round( Decimal( utils.convertCToF( ctemps[ 5 ] / 10  ) ), 2 )
+        
+        # Add the temperatures to the array
+        ftemps = [ fTempProbe0, fTempProbe1, fTempProbe2, fTempProbe3, fTempProbe4, fTempProbe5 ]
 
         # Output the fahrenheit temps
         print( ftemps )
