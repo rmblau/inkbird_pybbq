@@ -13,6 +13,10 @@ metadata = None
 
 
 
+# -----------------------------------------------------------------------------
+# Name: connectToDBFile
+# Abstract: Connects to the database file and stores the engine variable
+# -----------------------------------------------------------------------------
 def connectToDBFile( ):
 
     global engine
@@ -24,6 +28,11 @@ def connectToDBFile( ):
 
 
 
+# -----------------------------------------------------------------------------
+# Name: createMetaData
+# Abstract: Creates a metadata variable so we can create schemas to send 
+#           them to the DB
+# -----------------------------------------------------------------------------
 def createMetaData( ):
 
     global metadata
@@ -36,6 +45,10 @@ def createMetaData( ):
 
 
 
+# -----------------------------------------------------------------------------
+# Name: initializeDB
+# Abstract: Initializes the database with the base tables used to store data
+# -----------------------------------------------------------------------------
 def initializeDB( ):
 
     global metadata
@@ -61,6 +74,11 @@ def initializeDB( ):
 
 
 
+# -----------------------------------------------------------------------------
+# Name: connectToDB
+# Abstract: Checks if the db file exists. If not, it attempts to create the 
+#           file and initialize it with tables
+# -----------------------------------------------------------------------------
 def connectToDB( ):
 
     # Does the db already exist?

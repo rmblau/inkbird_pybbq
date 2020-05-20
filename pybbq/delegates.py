@@ -8,6 +8,7 @@ import globalVariables
 import utils
 
 
+
 # -----------------------------------------------------------------------------
 # Name: NotificationDelegate
 # Abstract: This is the delegate that handles notifications sent by BLE devices
@@ -42,6 +43,7 @@ class NotificationDelegate( btle.DefaultDelegate ):
     # End handleNotification
 
 
+
     # -----------------------------------------------------------------------------
     # Name: handleTemperature
     # Abstract: When temperature readings is received, handle it here
@@ -71,6 +73,7 @@ class NotificationDelegate( btle.DefaultDelegate ):
     # End handleTemperature
     
 
+
     # -----------------------------------------------------------------------------
     # Name: handleBattery
     # Abstract: When a battery reading is received, handle it here
@@ -99,6 +102,7 @@ class NotificationDelegate( btle.DefaultDelegate ):
     # End handleBattery( )
 
 # End Delegate( )
+
 
 
 # -----------------------------------------------------------------------------
