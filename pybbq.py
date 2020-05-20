@@ -1,4 +1,4 @@
-from bluepy import btle
+from bluepy  import btle
 from elevate import elevate
 
 import struct
@@ -8,22 +8,8 @@ import os
 import sys
 import signal
 
+import constants
 
-
-
-SETTINGS_RESULT_UUID    = 0xfff1
-ACCOUNT_AND_VERIFY_UUID = 0xfff2
-HISTORY_DATA_UUID       = 0xfff3
-REALTIME_DATA_UUID      = 0xfff4
-SETTINGS_DATA_UUID      = 0xfff5
-
-
-
-CREDENTIALS_MESSAGE          = bytes( [ 0x21, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0xb8, 0x22, 0x00, 0x00, 0x00, 0x00, 0x00 ] )
-REALTIME_DATA_ENABLE_MESSAGE = bytes( [ 0x0B, 0x01, 0x00, 0x00, 0x00, 0x00 ] )
-UNITS_F_MESSAGE              = bytes( [ 0x02, 0x01, 0x00, 0x00, 0x00, 0x00 ] )
-UNITS_C_MESSAGE              = bytes( [ 0x02, 0x00, 0x00, 0x00, 0x00, 0x00 ] )
-REQ_BATTERY_MESSAGE          = bytes( [ 0x08, 0x24, 0x00, 0x00, 0x00, 0x00 ] )
 
 
 scanner         = None
@@ -194,7 +180,7 @@ def connect( ):
 
     # Connect
     client = btle.Peripheral( address )
-    service = client.getServiceByUUID( "FFF0" )
+    service = client.getServiceByUUID( constants.SERVICE_UUID )
     characteristics = service.getCharacteristics( )
     client.setDelegate( Delegate( ) ) 
     client.writeCharacteristic( characteristics[ 0 ].getHandle( ) + 1, b"\x01\x00", withResponse = True )
@@ -211,7 +197,7 @@ def login( ):
     global characteristics
 
     # Login
-    characteristics[ 1 ].write( CREDENTIALS_MESSAGE, withResponse = True )
+    characteristics[ 1 ].write( constants.CREDENTIALS_MESSAGE, withResponse = True )
 
 # End login( )
 
@@ -224,7 +210,7 @@ def enableData( ):
     global characteristics
 
     # Enable Data
-    characteristics[ 4 ].write( REALTIME_DATA_ENABLE_MESSAGE, withResponse = True )
+    characteristics[ 4 ].write( constants.REALTIME_DATA_ENABLE_MESSAGE, withResponse = True )
 
 # End enableData( )
 
@@ -237,7 +223,7 @@ def setFarenheit( ):
     global characteristics
 
     # Set Farenheit
-    characteristics[ 4 ].write( UNITS_F_MESSAGE, withResponse = True )
+    characteristics[ 4 ].write( constants.UNITS_F_MESSAGE, withResponse = True )
 
 # End setFarenheit( )
 
@@ -250,7 +236,7 @@ def setCelsius( ):
     global characteristics
 
     # Set Celsius
-    characteristics[ 4 ].write( UNITS_C_MESSAGE, withResponse = True )
+    characteristics[ 4 ].write( constants.UNITS_C_MESSAGE, withResponse = True )
 
 # End setCelsius( )
 
@@ -263,7 +249,7 @@ def requestBattery( ):
     global characteristics
 
      # Request Battery
-    characteristics[ 4 ].write( REQ_BATTERY_MESSAGE, withResponse = True )
+    characteristics[ 4 ].write( constants.REQ_BATTERY_MESSAGE, withResponse = True )
 
 # End requestBattery( )
 
@@ -323,7 +309,7 @@ def main( ):
 
 # Run the main method
 if __name__ == '__main__':
-    
+
     main( )
 
 # End if
