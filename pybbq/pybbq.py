@@ -11,46 +11,70 @@ import delegates
 import globalVariables
 
 
-
+# -----------------------------------------------------------------------------
+# Name: signalHandler
+# Abstract: When a signal is sent, especially CTRL+C, make sure to shut down 
+#           the application gracefully
+# -----------------------------------------------------------------------------
 def signalHandler( signal, frame ):
 
     # Shutdown gracefully
     print( '\nExiting...\n' )
 
+    # Exit with exit status 0
     sys.exit( 0 )
 
 # End signal_handler( )
 
 
 
+# -----------------------------------------------------------------------------
+# Name: toggleBluetoothInterface
+# Abstract: This is so we can reset the interface (bring down then back up 
+#           again) as sometimes the BLE stack gets weird and doesn't respond 
+#           as expected
+# -----------------------------------------------------------------------------
 def toggleBluetoothInterface( ):
 
+    # Bring down the interface
     os.system( 'sudo hciconfig hci0 down' )
+    
+    # Bring up the interface again
     os.system( 'sudo hciconfig hci0 up' )
 
 # End toggleBluetoothInterface( )
 
 
 
+# -----------------------------------------------------------------------------
+# Name: scanForIBBQ
+# Abstract: Scans for a device named "iBBQ". Tries 3 times, each time with the 
+#           scan length getting longer. Starts at 2.5 seconds, then tries again 
+#           for 5 seconds, then tries for 10 seconds. If it is not found, 
+#           then we exit
+# -----------------------------------------------------------------------------
 def scanForIBBQ( ):
 
     retryCount  = 0
     timeout     = 2.5
 
+    # As long as we have not found the device and we haven't reached our retry limit
     while globalVariables.address == None and retryCount < 3:
 
         # Toggle the bluetooth interface if it is up, or bring it up if it is down
         toggleBluetoothInterface( )
 
+        # Update the user on our progress
         print( 'Scanning for devices for ', timeout, ' seconds...' )
 
         # Scan for the iBBQ device name and store it's mac address
         globalVariables.scanner = btle.Scanner( ).withDelegate( delegates.ScanDelegate( ) )
         globalVariables.scanner.scan( timeout )
 
+        # Did we find the iBBQ device?
         if globalVariables.address == None:
 
-            # Increment retry count
+            # No, Increment retry count
             retryCount += 1
 
             # Double the timeout time. Will go 2.5, 5, 10 seconds.
@@ -58,16 +82,17 @@ def scanForIBBQ( ):
 
         else:
             
-            # We have found the device
+            # Yes, We have found the device. No need to keep trying
             deviceFound = True
 
         # End if/else
 
     # End while
 
+    # Did we find the device?
     if globalVariables.address == None and retryCount == 3:
 
-        # Did not find the device
+        # No, exit and tell the user we could not find the device
         sys.exit( '\nUnable to find the device. Is it on and in range?\n' )
     
     # End if
@@ -76,14 +101,19 @@ def scanForIBBQ( ):
 
 
 
+# -----------------------------------------------------------------------------
+# Name: connect
+# Abstract: Connects to the iBBQ device
+# -----------------------------------------------------------------------------
 def connect( ):
 
-    # Connect
+    # Connect to the iBBQ device
     globalVariables.client          = btle.Peripheral( globalVariables.address )
     globalVariables.service         = globalVariables.client.getServiceByUUID( constants.SERVICE_UUID )
     globalVariables.characteristics = globalVariables.service.getCharacteristics( )
-
     globalVariables.client.setDelegate( delegates.NotificationDelegate( ) )
+
+    # Set some parameters for the device
     globalVariables.client.writeCharacteristic( globalVariables.characteristics[ 0 ].getHandle( ) + 1, b"\x01\x00", withResponse = True )
     globalVariables.client.writeCharacteristic( globalVariables.characteristics[ 3 ].getHandle( ) + 1, b"\x01\x00", withResponse = True )
 
@@ -91,6 +121,10 @@ def connect( ):
 
 
 
+# -----------------------------------------------------------------------------
+# Name: login
+# Abstract: Logs in to the iBBQ device
+# -----------------------------------------------------------------------------
 def login( ):
 
     # Login
@@ -100,50 +134,76 @@ def login( ):
 
 
 
+# -----------------------------------------------------------------------------
+# Name: enableData
+# Abstract: Enables the iBBQ device to send us realtime data
+# -----------------------------------------------------------------------------
 def enableData( ):
 
-    # Enable Data
+    # Enable realtime data
     globalVariables.characteristics[ 4 ].write( constants.REALTIME_DATA_ENABLE_MESSAGE, withResponse = True )
 
 # End enableData( )
 
 
 
+# -----------------------------------------------------------------------------
+# Name: setFarenheit
+# Abstract: Sets the iBBQ device to report in Farenheit
+# -----------------------------------------------------------------------------
 def setFarenheit( ):
 
-    # Set Farenheit
+    # Set farenheit
     globalVariables.characteristics[ 4 ].write( constants.UNITS_F_MESSAGE, withResponse = True )
 
 # End setFarenheit( )
 
 
 
+# -----------------------------------------------------------------------------
+# Name: setCelsius
+# Abstract: Sets the iBBQ device to report in Celsius
+# -----------------------------------------------------------------------------
 def setCelsius( ):
 
-    # Set Celsius
+    # Set celsius
     globalVariables.characteristics[ 4 ].write( constants.UNITS_C_MESSAGE, withResponse = True )
 
 # End setCelsius( )
 
 
 
+# -----------------------------------------------------------------------------
+# Name: requestBattery
+# Abstract: Requests the battery status from the iBBQ device
+# -----------------------------------------------------------------------------
 def requestBattery( ):
 
-     # Request Battery
+     # Request battery
     globalVariables.characteristics[ 4 ].write( constants.REQ_BATTERY_MESSAGE, withResponse = True )
 
 # End requestBattery( )
 
 
 
+# -----------------------------------------------------------------------------
+# Name: requestTemperatures
+# Abstract: Requests the temperature readings from the iBBQ device
+# -----------------------------------------------------------------------------
 def requestTemperatures( ):
 
+    # Request temperatures
     globalVariables.service.peripheral.readCharacteristic( globalVariables.characteristics[ 3 ].handle )
         
 # End requestTemperatures( )
 
 
 
+# -----------------------------------------------------------------------------
+# Name: readInformation
+# Abstract: After connecting and logging in to the iBBQ device, continually 
+#           requests information from the iBBQ device
+# -----------------------------------------------------------------------------
 def readInformation( ):
 
     connect( )
@@ -155,6 +215,7 @@ def readInformation( ):
     setFarenheit( )
     #setCelsius( )
    
+    # Continually request information from the iBBQ device
     while True:
 
         requestBattery( )
@@ -166,6 +227,12 @@ def readInformation( ):
 
 
 
+# -----------------------------------------------------------------------------
+# Name: main
+# Abstract: Registers a signal handler, elevates to a root process (needed for 
+#           bluepy/bluez), scans for and finds the iBBQ device, and lastly 
+#           proceeds to continually read information from the iBBQ device
+# -----------------------------------------------------------------------------
 def main( ):
 
     # Register handler for CTRL+C quitting
