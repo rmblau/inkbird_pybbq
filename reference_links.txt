@@ -7,3 +7,6 @@ https://github.com/viyh/inkbird
 
 # Example of using an ESP32 as a gateway between WiFi and ble Inkbird Thermometer
 https://github.com/dereulenspiegel/ibbq-gateway
+
+Another reference:
+https://github.com/jshridha/inkbird
