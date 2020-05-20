@@ -41,10 +41,16 @@ class Delegate( btle.DefaultDelegate ):
     def handleNotification( self, cHandle, data ):
     
         if cHandle == 48:
+
             self.handleTemperature( data )
+
+        # End if
         
         if cHandle == 37:
+
             self.handleBattery( data )
+
+        # End if
 
     # End handleNotification
 
@@ -67,7 +73,10 @@ class Delegate( btle.DefaultDelegate ):
     def handleBattery( self, data ):
         
         if data[ 0 ] != 36:
+            
             return
+
+        # End if
         
         battery, maxBattery = struct.unpack( "<HH", data[ 1 : 5 ] )
         battery = int( battery / maxBattery * 100 )
@@ -98,6 +107,8 @@ class ScanDelegate( btle.DefaultDelegate ):
                     
                     print( '\nFound iBBQ at ', dev.addr, '\n' )
                     address = dev.addr
+
+            # End if
             
         elif isNewData:
     
@@ -109,7 +120,7 @@ class ScanDelegate( btle.DefaultDelegate ):
 
 
 
-def signalHandler( sig, frame ):
+def signalHandler( signal, frame ):
 
     # Shutdown gracefully
     print( '\nExiting...\n' )
@@ -126,7 +137,6 @@ def toggleBluetoothInterface( ):
     os.system( 'sudo hciconfig hci0 up' )
 
 # End toggleBluetoothInterface( )
-
 
 
 
@@ -155,7 +165,7 @@ def scanForIBBQ( ):
             retryCount += 1
 
             # Double the timeout time. Will go 2.5, 5, 10 seconds.
-            timeout    *= 2
+            timeout *= 2
 
         else:
             
@@ -164,16 +174,23 @@ def scanForIBBQ( ):
 
         # End if/else
 
+    # End while
+
     if address == None and retryCount == 3:
 
         # Did not find the device
         sys.exit( '\nUnable to find the device. Is it on and in range?\n' )
     
+    # End if
+
 # End scanForIBBQ
 
 
+def connect( ):
 
-def readInformation( ):
+    global client
+    global service
+    global characteristics
 
     # Connect
     client = btle.Peripheral( address )
@@ -183,23 +200,104 @@ def readInformation( ):
     client.writeCharacteristic( characteristics[ 0 ].getHandle( ) + 1, b"\x01\x00", withResponse = True )
     client.writeCharacteristic( characteristics[ 3 ].getHandle( ) + 1, b"\x01\x00", withResponse = True )
 
+# End connect( )
+
+
+
+def login( ):
+
+    global client
+    global service
+    global characteristics
+
     # Login
     characteristics[ 1 ].write( CREDENTIALS_MESSAGE, withResponse = True )
+
+# End login( )
+
+
+
+def enableData( ):
+
+    global client
+    global service
+    global characteristics
 
     # Enable Data
     characteristics[ 4 ].write( REALTIME_DATA_ENABLE_MESSAGE, withResponse = True )
 
+# End enableData( )
+
+
+
+def setFarenheit( ):
+
+    global client
+    global service
+    global characteristics
+
     # Set Farenheit
+    characteristics[ 4 ].write( UNITS_F_MESSAGE, withResponse = True )
+
+# End setFarenheit( )
+
+
+
+def setCelsius( ):
+
+    global client
+    global service
+    global characteristics
+
+    # Set Celsius
     characteristics[ 4 ].write( UNITS_C_MESSAGE, withResponse = True )
 
-    # Request Battery
+# End setCelsius( )
+
+
+
+def requestBattery( ):
+
+    global client
+    global service
+    global characteristics
+
+     # Request Battery
     characteristics[ 4 ].write( REQ_BATTERY_MESSAGE, withResponse = True )
 
-    # Request Temperature
+# End requestBattery( )
+
+
+
+def requestTemperatures( ):
+
+    global client
+    global service
+    global characteristics
+
+    service.peripheral.readCharacteristic( characteristics[ 3 ].handle )
+        
+# End requestTemperatures( )
+
+
+
+def readInformation( ):
+
+    connect( )
+
+    login( )
+
+    enableData( )
+
+    setFarenheit( )
+    #setCelsius( )
+   
     while True:
 
-        service.peripheral.readCharacteristic( characteristics[ 3 ].handle )
-        characteristics[ 4 ].write( REQ_BATTERY_MESSAGE, withResponse = True )
+        requestBattery( )
+        requestTemperatures( )
+
+    # End while
 
 # End readInformation( )
 
@@ -225,4 +323,7 @@ def main( ):
 
 # Run the main method
 if __name__ == '__main__':
+    
     main( )
+
+# End if
