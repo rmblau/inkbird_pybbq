@@ -2,13 +2,11 @@ from sqlalchemy_utils import create_database, database_exists
 from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String
 import os.path
 
-
-
 import constants
 
 
 
-engine = None
+engine   = None
 metadata = None
 
 
