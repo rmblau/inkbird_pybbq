@@ -4,6 +4,7 @@ import struct
 import array
 
 import globalVariables
+import utils
 
 
 # -----------------------------------------------------------------------------
@@ -46,15 +47,29 @@ class NotificationDelegate( btle.DefaultDelegate ):
     # -----------------------------------------------------------------------------
     def handleTemperature( self, data ):
         
-        # Begin parsing the temperature information
-        temp = array.array( "H" )
-        temp.frombytes( data )
-        
-        #for probe, t in enumerate(temp):
-        #    self.probes[probe + 1].temperature = t
-        
-        # Print out the temperatures that were reported
-        print( temp )
+        # Load up 2 arrays
+        ctemps = array.array( "H" )
+        ftemps = array.array( "f" )
+
+        # Fill the array with the temperatures
+        ctemps.frombytes( data )
+
+        # Loop through the celsius temperatures
+        for index, ctemp in enumerate( ctemps ):
+
+            # Device reports celsius * 10
+            ctemp = ctemp / 10
+
+            # Convert to Fahrenheit
+            ftemp = utils.convertCToF( ctemp )
+
+            # Convert temperature and store in fahrenheit array
+            ftemps.append( ftemp )
+
+        # End for
+
+        # Output the fahrenheit temps
+        print( ftemps )
 
     # End handleTemperature
     
