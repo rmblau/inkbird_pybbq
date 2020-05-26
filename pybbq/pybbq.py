@@ -3,7 +3,7 @@ from elevate import elevate
 import sys
 import signal
 
-import device_utils
+from utilities import device
 
 
 
@@ -32,20 +32,20 @@ def signalHandler( signal, frame ):
 # -----------------------------------------------------------------------------
 def readInformation( ):
 
-    device_utils.connect( )
+    device.connect( )
 
-    device_utils.login( )
+    device.login( )
 
-    device_utils.enableData( )
+    device.enableData( )
 
-    device_utils.setFarenheit( )
-    #device_utils.setCelsius( )
+    device.setFarenheit( )
+    #device.setCelsius( )
    
     # Continually request information from the iBBQ device
     while True:
 
-        device_utils.requestBattery( )
-        device_utils.requestTemperatures( )
+        device.requestBattery( )
+        device.requestTemperatures( )
 
     # End while
 
@@ -68,7 +68,7 @@ def main( ):
     elevate( graphical = False )
 
     # Auto scan for the iBBQ thermometer
-    device_utils.scanForIBBQ( )
+    device.scanForIBBQ( )
 
     # Proceed ( this is a place holder until more is methodized )
     readInformation( )

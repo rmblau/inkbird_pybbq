@@ -4,8 +4,8 @@ from decimal import Decimal
 import struct
 import array
 
-import globalVariables
-import utils
+from variables import global_vars
+from utilities import general
 
 
 
@@ -57,12 +57,12 @@ class NotificationDelegate( btle.DefaultDelegate ):
         ctemps.frombytes( data )
 
         # Fill each variable the decimal result
-        fTempProbe0 = round( Decimal( utils.convertCToF( ctemps[ 0 ] / 10  ) ), 2 )
-        fTempProbe1 = round( Decimal( utils.convertCToF( ctemps[ 1 ] / 10  ) ), 2 )
-        fTempProbe2 = round( Decimal( utils.convertCToF( ctemps[ 2 ] / 10  ) ), 2 )
-        fTempProbe3 = round( Decimal( utils.convertCToF( ctemps[ 3 ] / 10  ) ), 2 )
-        fTempProbe4 = round( Decimal( utils.convertCToF( ctemps[ 4 ] / 10  ) ), 2 )
-        fTempProbe5 = round( Decimal( utils.convertCToF( ctemps[ 5 ] / 10  ) ), 2 )
+        fTempProbe0 = round( Decimal( general.convertCToF( ctemps[ 0 ] / 10  ) ), 2 )
+        fTempProbe1 = round( Decimal( general.convertCToF( ctemps[ 1 ] / 10  ) ), 2 )
+        fTempProbe2 = round( Decimal( general.convertCToF( ctemps[ 2 ] / 10  ) ), 2 )
+        fTempProbe3 = round( Decimal( general.convertCToF( ctemps[ 3 ] / 10  ) ), 2 )
+        fTempProbe4 = round( Decimal( general.convertCToF( ctemps[ 4 ] / 10  ) ), 2 )
+        fTempProbe5 = round( Decimal( general.convertCToF( ctemps[ 5 ] / 10  ) ), 2 )
         
         # Add the temperatures to the array
         ftemps = [ fTempProbe0, fTempProbe1, fTempProbe2, fTempProbe3, fTempProbe4, fTempProbe5 ]
@@ -130,7 +130,7 @@ class ScanDelegate( btle.DefaultDelegate ):
                     
                     # Yes, tell the user we found it and record the mac address
                     print( '\nFound iBBQ at ', dev.addr, '\n' )
-                    globalVariables.address = dev.addr
+                    global_vars.address = dev.addr
 
             # End if
             

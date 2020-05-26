@@ -3,9 +3,9 @@ from bluepy import btle
 import os
 import sys
 
-import globalVariables
-import constants
-import delegates
+from variables import global_vars
+from variables import constants
+from variables import delegates
 
 
 
@@ -40,7 +40,7 @@ def scanForIBBQ( ):
     timeout     = 2.5
 
     # As long as we have not found the device and we haven't reached our retry limit
-    while globalVariables.address == None and retryCount < 3:
+    while global_vars.address == None and retryCount < 3:
 
         # Toggle the bluetooth interface if it is up, or bring it up if it is down
         toggleBluetoothInterface( )
@@ -49,11 +49,11 @@ def scanForIBBQ( ):
         print( 'Scanning for devices for ', timeout, ' seconds...' )
 
         # Scan for the iBBQ device name and store it's mac address
-        globalVariables.scanner = btle.Scanner( ).withDelegate( delegates.ScanDelegate( ) )
-        globalVariables.scanner.scan( timeout )
+        global_vars.scanner = btle.Scanner( ).withDelegate( delegates.ScanDelegate( ) )
+        global_vars.scanner.scan( timeout )
 
         # Did we find the iBBQ device?
-        if globalVariables.address == None:
+        if global_vars.address == None:
 
             # No, Increment retry count
             retryCount += 1
@@ -71,7 +71,7 @@ def scanForIBBQ( ):
     # End while
 
     # Did we find the device?
-    if globalVariables.address == None and retryCount == 3:
+    if global_vars.address == None and retryCount == 3:
 
         # No, exit and tell the user we could not find the device
         sys.exit( '\nUnable to find the device. Is it on and in range?\n' )
@@ -89,14 +89,14 @@ def scanForIBBQ( ):
 def connect( ):
 
     # Connect to the iBBQ device
-    globalVariables.client          = btle.Peripheral( globalVariables.address )
-    globalVariables.service         = globalVariables.client.getServiceByUUID( constants.SERVICE_UUID )
-    globalVariables.characteristics = globalVariables.service.getCharacteristics( )
-    globalVariables.client.setDelegate( delegates.NotificationDelegate( ) )
+    global_vars.client          = btle.Peripheral( global_vars.address )
+    global_vars.service         = global_vars.client.getServiceByUUID( constants.SERVICE_UUID )
+    global_vars.characteristics = global_vars.service.getCharacteristics( )
+    global_vars.client.setDelegate( delegates.NotificationDelegate( ) )
 
     # Set some parameters for the device
-    globalVariables.client.writeCharacteristic( globalVariables.characteristics[ 0 ].getHandle( ) + 1, b"\x01\x00", withResponse = True )
-    globalVariables.client.writeCharacteristic( globalVariables.characteristics[ 3 ].getHandle( ) + 1, b"\x01\x00", withResponse = True )
+    global_vars.client.writeCharacteristic( global_vars.characteristics[ 0 ].getHandle( ) + 1, b"\x01\x00", withResponse = True )
+    global_vars.client.writeCharacteristic( global_vars.characteristics[ 3 ].getHandle( ) + 1, b"\x01\x00", withResponse = True )
 
 # End connect( )
 
@@ -109,7 +109,7 @@ def connect( ):
 def login( ):
 
     # Login
-    globalVariables.characteristics[ 1 ].write( constants.CREDENTIALS_MESSAGE, withResponse = True )
+    global_vars.characteristics[ 1 ].write( constants.CREDENTIALS_MESSAGE, withResponse = True )
 
 # End login( )
 
@@ -122,7 +122,7 @@ def login( ):
 def enableData( ):
 
     # Enable realtime data
-    globalVariables.characteristics[ 4 ].write( constants.REALTIME_DATA_ENABLE_MESSAGE, withResponse = True )
+    global_vars.characteristics[ 4 ].write( constants.REALTIME_DATA_ENABLE_MESSAGE, withResponse = True )
 
 # End enableData( )
 
@@ -135,7 +135,7 @@ def enableData( ):
 def setFarenheit( ):
 
     # Set farenheit
-    globalVariables.characteristics[ 4 ].write( constants.UNITS_F_MESSAGE, withResponse = True )
+    global_vars.characteristics[ 4 ].write( constants.UNITS_F_MESSAGE, withResponse = True )
 
 # End setFarenheit( )
 
@@ -148,7 +148,7 @@ def setFarenheit( ):
 def setCelsius( ):
 
     # Set celsius
-    globalVariables.characteristics[ 4 ].write( constants.UNITS_C_MESSAGE, withResponse = True )
+    global_vars.characteristics[ 4 ].write( constants.UNITS_C_MESSAGE, withResponse = True )
 
 # End setCelsius( )
 
@@ -161,7 +161,7 @@ def setCelsius( ):
 def requestBattery( ):
 
      # Request battery
-    globalVariables.characteristics[ 4 ].write( constants.REQ_BATTERY_MESSAGE, withResponse = True )
+    global_vars.characteristics[ 4 ].write( constants.REQ_BATTERY_MESSAGE, withResponse = True )
 
 # End requestBattery( )
 
@@ -174,6 +174,6 @@ def requestBattery( ):
 def requestTemperatures( ):
 
     # Request temperatures
-    globalVariables.service.peripheral.readCharacteristic( globalVariables.characteristics[ 3 ].handle )
+    global_vars.service.peripheral.readCharacteristic( global_vars.characteristics[ 3 ].handle )
         
 # End requestTemperatures( )
