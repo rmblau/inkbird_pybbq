@@ -93,6 +93,23 @@ def connectToDB( ):
 # End connectToDB( )
 
 
+
+# -----------------------------------------------------------------------------
+# Name: disconnectDB
+# Abstract: Disconnects from the database
+# -----------------------------------------------------------------------------
+def disconnectDB( ):
+
+    global engine
+
+    if engine is not None:
+
+        engine.dispose( )
+
+# End disconnectDB( )
+
+
+
 # Run the main method
 if __name__ == '__main__':
 
