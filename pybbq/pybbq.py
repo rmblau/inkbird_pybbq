@@ -21,7 +21,7 @@ def signalHandler( signal, frame ):
     # Exit with exit status 0
     sys.exit( 0 )
 
-# End signal_handler( )
+# End signalHandler( )
 
 
 
@@ -32,15 +32,6 @@ def signalHandler( signal, frame ):
 # -----------------------------------------------------------------------------
 def readInformation( ):
 
-    device.connect( )
-
-    device.login( )
-
-    device.enableData( )
-
-    device.setFarenheit( )
-    #device.setCelsius( )
-   
     # Continually request information from the iBBQ device
     while True:
 
@@ -54,12 +45,36 @@ def readInformation( ):
 
 
 # -----------------------------------------------------------------------------
-# Name: main
-# Abstract: Registers a signal handler, elevates to a root process (needed for 
-#           bluepy/bluez), scans for and finds the iBBQ device, and lastly 
-#           proceeds to continually read information from the iBBQ device
+# Name: startDeviceCommunication
+# Abstract: 
 # -----------------------------------------------------------------------------
-def main( ):
+def startDeviceCommunication( ):
+
+    # Auto scan for the iBBQ thermometer
+    device.scanForIBBQ( )
+
+    # Connect to the device
+    device.connect( )
+
+    # Login to the device
+    device.login( )
+
+    # Enable real time data
+    device.enableData( )
+
+    # Set which temperature unit we want to receive
+    device.setFarenheit( )       # Currently does not get Farenheit temps from 
+    #device.setCelsius( )        # device itself
+   
+# End startDeviceCommunication( )
+
+
+
+# -----------------------------------------------------------------------------
+# Name: processInitialization
+# Abstract: Initialize some stuff for the process
+# -----------------------------------------------------------------------------
+def processInitialization( ):
 
     # Register handler for CTRL+C quitting
     signal.signal( signal.SIGINT, signalHandler )
@@ -67,11 +82,44 @@ def main( ):
     # Elevate to root permission
     elevate( graphical = False )
 
-    # Auto scan for the iBBQ thermometer
-    device.scanForIBBQ( )
+# End processInitialization( )
 
-    # Proceed ( this is a place holder until more is methodized )
-    readInformation( )
+
+
+# -----------------------------------------------------------------------------
+# Name: startReadingCollection
+# Abstract: Start the reading collection process
+# -----------------------------------------------------------------------------
+def startReadingCollection( ):
+
+    # Continually request information from the iBBQ device
+    while True:
+
+        device.requestBattery( )
+        device.requestTemperatures( )
+
+    # End while
+
+# End startReadingCollection( )
+
+
+
+# -----------------------------------------------------------------------------
+# Name: main
+# Abstract: Registers a signal handler, elevates to a root process (needed for 
+#           bluepy/bluez), scans for and finds the iBBQ device, and lastly 
+#           proceeds to continually read information from the iBBQ device
+# -----------------------------------------------------------------------------
+def main( ):
+
+    # Initialize some stuff for the process
+    processInitialization( )
+
+    # Start the device communication
+    startDeviceCommunication( )
+
+    # Start reading collection
+    startReadingCollection( )
 
 # End main( )
 
