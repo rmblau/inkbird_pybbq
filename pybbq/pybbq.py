@@ -7,6 +7,7 @@ import device_utils
 
 
 
+
 # -----------------------------------------------------------------------------
 # Name: signalHandler
 # Abstract: When a signal is sent, especially CTRL+C, make sure to shut down 
