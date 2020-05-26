@@ -9,6 +9,6 @@ ToDo:
     1.) Implement try/catch and logging functions for all methods
     2.) Create sqlite structure/schema and get it built during the initialization of a new db
     3.) Need to somehow check db integrity on start to make sure nothing is corrupt
-    4.) Need a method to gracefully disconnect from database
+    ***DONE*** 4.) Need a method to gracefully disconnect from database ***DONE***
     5.) Begin building a web interface
     6.) Try to get device to report fahrenheit over BLE instead of celsius*10
