@@ -2,9 +2,12 @@ from elevate import elevate
 
 import sys
 import signal
+import os
 
 from utilities import device
-
+from utilities import database
+from variables import constants
+from variables import global_vars
 
 
 
@@ -105,6 +108,20 @@ def startReadingCollection( ):
 
 
 # -----------------------------------------------------------------------------
+# Name: initializeGlobalVariables
+# Abstract: Gets the current path, adds the db filename, then stores it in 
+#           global variables
+# -----------------------------------------------------------------------------
+def initializeGlobalVariables( ):
+
+    # Populate the global variable with the path
+    global_vars.DB_PATH = os.path.join( os.path.dirname(os.path.abspath(__file__)), constants.DB_FILENAME )
+
+# End initializeGlobalVariables( )
+
+
+
+# -----------------------------------------------------------------------------
 # Name: main
 # Abstract: Registers a signal handler, elevates to a root process (needed for 
 #           bluepy/bluez), scans for and finds the iBBQ device, and lastly 
@@ -114,6 +131,13 @@ def main( ):
 
     # Initialize some stuff for the process
     processInitialization( )
+
+    # Initialize global variables
+    initializeGlobalVariables( )
+
+    # Connects to DB if it exists, creates it if it doesn't exist and then 
+    # connects
+    database.createConnectToDatabase( )
 
     # Start the device communication
     startDeviceCommunication( )

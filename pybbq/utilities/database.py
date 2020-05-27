@@ -1,118 +1,59 @@
-from sqlalchemy_utils import create_database, database_exists
-from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String
-import os.path
+import sqlite3
 
-from variables import constants
+from variables import global_vars
 
 
 
-engine   = None
-metadata = None
+connection = None
+cursor     = None
 
 
 
 # -----------------------------------------------------------------------------
-# Name: connectToDBFile
-# Abstract: Connects to the database file and stores the engine variable
+# Name: createConnection
+# Abstract: Create a connection to the database file
 # -----------------------------------------------------------------------------
-def connectToDBFile( ):
+def createConnection( ):
 
-    global engine
+    global connection
 
-    # Create the DB Engine and get an engine variable
-    engine = create_engine( constants.DB_URI )
+    print( global_vars.DB_PATH )
 
-# End connectToDBFile( )
+    # Create the connection
+    connection = sqlite3.connect( global_vars.DB_PATH )
 
-
-
-# -----------------------------------------------------------------------------
-# Name: createMetaData
-# Abstract: Creates a metadata variable so we can create schemas to send 
-#           them to the DB
-# -----------------------------------------------------------------------------
-def createMetaData( ):
-
-    global metadata
-    global engine
-
-    # Create a new metadata variable
-    metadata = MetaData( )
-
-# End createMetaData( )
+# End createConnection( )
 
 
 
 # -----------------------------------------------------------------------------
-# Name: initializeDB
-# Abstract: Initializes the database with the base tables used to store data
+# Name: createCursor
+# Abstract: Create a cursor using the connection
 # -----------------------------------------------------------------------------
-def initializeDB( ):
+def createCursor( ):
 
-    global metadata
-    global engine
+    global connection
+    global cursor
 
-    # First we need to connect to the database
-    connectToDBFile( )
+    # Create a cursor
+    cursor = connection.cursor( )
 
-    # Next we need a metadata variable
-    createMetaData( )
-
-    # Define a table
-    students = Table( 'students', metadata, 
-        Column( 'id',       Integer, primary_key = True ), 
-        Column( 'name',     String                      ), 
-        Column( 'lastname', String                      )
-    ) # End students
-
-    # Finally, create the schema
-    metadata.create_all( engine )
-
-# End initializeDB( )
+# End createCursor( )
 
 
 
 # -----------------------------------------------------------------------------
-# Name: connectToDB
-# Abstract: Checks if the db file exists. If not, it attempts to create the 
-#           file and initialize it with tables
+# Name: createConnectToDatabase
+# Abstract: Calls both createConnection and createCursor. This will create the 
+#           database file and connect to it if it exists. If it already exists, 
+#           it will simply connect to it. 
 # -----------------------------------------------------------------------------
-def connectToDB( ):
+def createConnectToDatabase( ):
 
-    # Does the db already exist?
-    if database_exists( constants.DB_URI ) == False:
+    # Create a connection
+    createConnection( )
 
-        # No, first create it
-        create_database( constants.DB_URI )
+    # Create the cursor
+    createCursor( )
 
-        # Then initialize it with a schema
-        initializeDB( )
-
-    # End if
-
-# End connectToDB( )
-
-
-
-# -----------------------------------------------------------------------------
-# Name: disconnectDB
-# Abstract: Disconnects from the database
-# -----------------------------------------------------------------------------
-def disconnectDB( ):
-
-    global engine
-
-    if engine is not None:
-
-        engine.dispose( )
-
-# End disconnectDB( )
-
-
-
-# Run the main method
-if __name__ == '__main__':
-
-    connectToDB( )
-
-# End if
+# End createConnectToDatabase( )

@@ -15,7 +15,5 @@ UNITS_F_MESSAGE              = bytes( [ 0x02, 0x01, 0x00, 0x00, 0x00, 0x00 ] )
 UNITS_C_MESSAGE              = bytes( [ 0x02, 0x00, 0x00, 0x00, 0x00, 0x00 ] )
 REQ_BATTERY_MESSAGE          = bytes( [ 0x08, 0x24, 0x00, 0x00, 0x00, 0x00 ] )
 
-# Other constants we need
-BASE_PATH = '/home/pi/inkbird_pybbq/pybbq/'
+# DB constants
 DB_FILENAME = 'pybbq.db'
-DB_URI = 'sqlite:///' + BASE_PATH + DB_FILENAME
