@@ -6,6 +6,7 @@ import os
 
 from utilities import device
 from utilities import database
+from utilities import general
 from variables import constants
 from variables import global_vars
 
@@ -18,11 +19,8 @@ from variables import global_vars
 # -----------------------------------------------------------------------------
 def signalHandler( signal, frame ):
 
-    # Shutdown gracefully
-    print( '\nExiting...\n' )
-
-    # Exit with exit status 0
-    sys.exit( 0 )
+    # Call the exit method to clean up and exit cleanly
+    general.signalExitApp( )
 
 # End signalHandler( )
 
