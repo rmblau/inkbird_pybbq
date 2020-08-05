@@ -10,3 +10,6 @@ https://github.com/dereulenspiegel/ibbq-gateway
 
 Another reference:
 https://github.com/jshridha/inkbird
+
+# 3 part youtube series of a guy "hacking" the inkbird bluetooth communication
+https://www.youtube.com/watch?v=D1OIcBVCZHw&list=PLHEQXEebQbVqk0e4JPva0WYM7PupNLzbe&index=1
