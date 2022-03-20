@@ -1,4 +1,4 @@
-from elevate import elevate
+
 
 import sys
 import signal
@@ -11,145 +11,138 @@ from variables import constants
 from variables import global_vars
 
 
-
 # -----------------------------------------------------------------------------
 # Name: signalHandler
-# Abstract: When a signal is sent, especially CTRL+C, make sure to shut down 
+# Abstract: When a signal is sent, especially CTRL+C, make sure to shut down
 #           the application gracefully
 # -----------------------------------------------------------------------------
-def signalHandler( signal, frame ):
+def signalHandler(signal, frame):
 
     # Call the exit method to clean up and exit cleanly
-    general.signalExitApp( )
+    return general.signalExitApp()
 
 # End signalHandler( )
 
 
-
 # -----------------------------------------------------------------------------
 # Name: readInformation
-# Abstract: After connecting and logging in to the iBBQ device, continually 
+# Abstract: After connecting and logging in to the iBBQ device, continually
 #           requests information from the iBBQ device
 # -----------------------------------------------------------------------------
-def readInformation( ):
+def readInformation():
 
     # Continually request information from the iBBQ device
     while True:
 
-        device.requestBattery( )
-        device.requestTemperatures( )
+        device.requestBattery()
+        device.requestTemperatures()
 
     # End while
 
 # End readInformation( )
 
 
-
 # -----------------------------------------------------------------------------
 # Name: startDeviceCommunication
-# Abstract: 
+# Abstract:
 # -----------------------------------------------------------------------------
-def startDeviceCommunication( ):
+def startDeviceCommunication():
 
     # Auto scan for the iBBQ thermometer
-    device.scanForIBBQ( )
+    device.scanForIBBQ()
 
     # Connect to the device
-    device.connect( )
+    device.connect()
 
     # Login to the device
-    device.login( )
+    device.login()
 
     # Enable real time data
-    device.enableData( )
+    device.enableData()
 
     # Set which temperature unit we want to receive
-    device.setFarenheit( )       # Currently does not get Farenheit temps from 
-    #device.setCelsius( )        # device itself
-   
-# End startDeviceCommunication( )
+    device.setFarenheit()       # Currently does not get Farenheit temps from
+    # device.setCelsius( )        # device itself
 
+# End startDeviceCommunication( )
 
 
 # -----------------------------------------------------------------------------
 # Name: processInitialization
 # Abstract: Initialize some stuff for the process
 # -----------------------------------------------------------------------------
-def processInitialization( ):
+def processInitialization():
 
     # Register handler for CTRL+C quitting
-    signal.signal( signal.SIGINT, signalHandler )
-    
+    signal.signal(signal.SIGINT, signalHandler)
+
     # Elevate to root permission
-    elevate( graphical = False )
+    # elevate(graphical=False)
 
 # End processInitialization( )
-
 
 
 # -----------------------------------------------------------------------------
 # Name: startReadingCollection
 # Abstract: Start the reading collection process
 # -----------------------------------------------------------------------------
-def startReadingCollection( ):
+def startReadingCollection():
 
     # Continually request information from the iBBQ device
     while True:
 
-        device.requestBattery( )
-        device.requestTemperatures( )
+        device.requestBattery()
+        device.requestTemperatures()
 
     # End while
 
 # End startReadingCollection( )
 
 
-
 # -----------------------------------------------------------------------------
 # Name: initializeGlobalVariables
-# Abstract: Gets the current path, adds the db filename, then stores it in 
+# Abstract: Gets the current path, adds the db filename, then stores it in
 #           global variables
 # -----------------------------------------------------------------------------
-def initializeGlobalVariables( ):
+def initializeGlobalVariables():
 
     # Populate the global variable with the path
-    global_vars.DB_PATH = os.path.join( os.path.dirname(os.path.abspath(__file__)), constants.DB_FILENAME )
+    global_vars.DB_PATH = os.path.join(os.path.dirname(
+        os.path.abspath(__file__)), constants.DB_FILENAME)
 
 # End initializeGlobalVariables( )
 
 
-
 # -----------------------------------------------------------------------------
 # Name: main
-# Abstract: Registers a signal handler, elevates to a root process (needed for 
-#           bluepy/bluez), scans for and finds the iBBQ device, and lastly 
+# Abstract: Registers a signal handler, elevates to a root process (needed for
+#           bluepy/bluez), scans for and finds the iBBQ device, and lastly
 #           proceeds to continually read information from the iBBQ device
 # -----------------------------------------------------------------------------
-def main( ):
+def main():
 
     # Initialize some stuff for the process
-    processInitialization( )
+    processInitialization()
 
     # Initialize global variables
-    initializeGlobalVariables( )
+    initializeGlobalVariables()
 
-    # Connects to DB if it exists, creates it if it doesn't exist and then 
+    # Connects to DB if it exists, creates it if it doesn't exist and then
     # connects
-    database.createConnectToDatabase( )
+    database.createConnectToDatabase()
 
     # Start the device communication
-    startDeviceCommunication( )
+    startDeviceCommunication()
 
     # Start reading collection
-    startReadingCollection( )
+    startReadingCollection()
 
 # End main( )
-
 
 
 # Run the main method
 if __name__ == '__main__':
 
-    main( )
+    main()
 
 # End if
